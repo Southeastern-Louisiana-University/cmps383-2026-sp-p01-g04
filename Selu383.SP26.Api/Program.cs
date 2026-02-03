@@ -8,20 +8,22 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Entity Framework Core with SQL Server
+// REQUIREMENT: Use SQL Server and the connection string name "DataContext"
 builder.Services.AddDbContext<DataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext")));
 
 var app = builder.Build();
 
-// Migrate and seed the database on startup
+// REQUIREMENT: The database should be programmatically created and migrated on startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<DataContext>();
 
-    // This creates the tables and seeds data
+    // This applies any pending migrations and creates the DB if it doesn't exist
     context.Database.Migrate();
+
+    // REQUIREMENT: Prepopulate with seed data
     SeedData.Initialize(context);
 }
 
@@ -38,5 +40,5 @@ app.MapControllers();
 
 app.Run();
 
-// Required for automated integration tests
+// REQUIREMENT: Required for automated integration tests
 public partial class Program { }
