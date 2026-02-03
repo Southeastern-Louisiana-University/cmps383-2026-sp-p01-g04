@@ -20,6 +20,6 @@ public sealed class CreateLocationDto
 
     [Range(1, int.MaxValue)]
     // TableCount must be at least 1
-
+     
     public int TableCount { get; set; }
 }
