@@ -33,7 +33,7 @@ app.MapControllers();
 // Migrate and seed the database on startup
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    var services = scope.ServiceProvider;           //777
     var context = services.GetRequiredService<DataContext>();
 
     // This is critical: it creates the tables and data on the Azure DB during the GitHub Test run
