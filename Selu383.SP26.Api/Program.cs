@@ -41,4 +41,4 @@ app.MapControllers();
 app.Run();
 
 // REQUIREMENT: Required for automated integration tests
-public partial class Program { }
+public partial class Program { }   
