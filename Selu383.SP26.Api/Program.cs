@@ -1,13 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using Selu383.SP26.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// REQUIREMENT: Use SQL Server and the connection string name "DataContext"
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DataContext")));
+
 var app = builder.Build();
+
+// REQUIREMENT: The database should be programmatically created and migrated on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<DataContext>();
+
+    // This applies any pending migrations and creates the DB if it doesn't exist
+    context.Database.Migrate();
+
+    // REQUIREMENT: Prepopulate with seed data
+    SeedData.Initialize(context);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -17,13 +35,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
 
-//see: https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-8.0
-// Hi 383 - this is added so we can test our web project automatically
-public partial class Program { }
+// REQUIREMENT: Required for automated integration tests
+public partial class Program { }   
